@@ -5,4 +5,5 @@ from .models import BorrowRecord
 class BorrowRecordSerializer(serializers.ModelSerializer):
     class Meta:
         model = BorrowRecord
-        fields = "__all__"
+        exclude = ["user", "returned_at"]
+        read_only_fields = ["status"]

@@ -1,4 +1,5 @@
-from django.core.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError
+from django.utils import timezone
 from .models import BorrowRecord
 
 
@@ -38,3 +39,23 @@ class BorrowBook:
         )
 
         return borrow_record
+
+class ReturnBook:
+
+    def update_available_copies(self,book):
+        book.available_copies += 1
+        book.save()
+        
+    def return_book(self,borrow_record):
+        borrow_record.status = BorrowRecord.StatusChoices.RETURNED
+        borrow_record.returned_at = timezone.now()
+        borrow_record.save()
+        
+    def return_borrowed_book(self, borrow_record):
+        if borrow_record.status != BorrowRecord.StatusChoices.BORROWED:
+            raise ValidationError("This book has already been returned.")
+        
+        self.update_available_copies(borrow_record.book)
+        self.return_book(borrow_record)
+        
+    
