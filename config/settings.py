@@ -146,3 +146,4 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=20),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
 }
+BORROW_DURATION_DAYS = 14

@@ -15,8 +15,7 @@ class BorrowRecordViewSet(ModelViewSet):
     def perform_create(self, serializer):
         user = self.request.user
         book = serializer.validated_data['book']
-        due_date = serializer.validated_data['due_date']
-        BorrowBook().borrow(user, book, due_date)
+        BorrowBook().borrow(user, book)
 
     @action(detail=True, methods=["post"])
     def return_book(self, request, pk=None):
