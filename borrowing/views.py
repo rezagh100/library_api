@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 
+
 class BorrowRecordViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
     queryset = BorrowRecord.objects.all()
@@ -15,7 +16,8 @@ class BorrowRecordViewSet(ModelViewSet):
     def perform_create(self, serializer):
         user = self.request.user
         book = serializer.validated_data['book']
-        BorrowBook().borrow(user, book)
+        borrow_record = BorrowBook().borrow(user, book)
+        serializer.instance = borrow_record
 
     @action(detail=True, methods=["post"])
     def return_book(self, request, pk=None):

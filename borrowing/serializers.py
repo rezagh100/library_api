@@ -3,7 +3,8 @@ from .models import BorrowRecord
 
 
 class BorrowRecordSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = BorrowRecord
-        exclude = ["user", "returned_at","due_date"]
-        read_only_fields = ["status"]
+        exclude = ['user', 'returned_at']
+        read_only_fields = ['due_date', 'status', 'borrowed_at']
