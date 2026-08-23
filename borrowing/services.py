@@ -40,13 +40,14 @@ class BorrowBook:
         )
         return borrow_record
 
-    def borrow(self, user, book):
+    def borrow(self, user, book, due_date=None):
         with transaction.atomic():
             self.book_limit(user)
             self.available_copies(book)
             self.update_available_copies(book)
 
-            due_date = self.calculate_due_date()
+            if due_date is None:
+                due_date = self.calculate_due_date()
 
             return self.book_record(
                 user,
