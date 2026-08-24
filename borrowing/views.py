@@ -31,8 +31,12 @@ class BorrowRecordViewSet(ModelViewSet):
     @action(detail=True, methods=["post"])
     def return_book(self, request, pk=None):
         borrow_record = self.get_object()
+        user = request.user
 
-        if borrow_record.user != request.user:
+        if (
+            borrow_record.user != user
+            and user.role != User.Role.LIBRARIAN
+        ):
             return Response(
                 {"detail": "You cannot return this book."},
                 status=status.HTTP_403_FORBIDDEN
@@ -41,3 +45,4 @@ class BorrowRecordViewSet(ModelViewSet):
         ReturnBook().return_borrowed_book(borrow_record)
 
         return Response({"status": "book returned"})
+    
