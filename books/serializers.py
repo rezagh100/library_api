@@ -21,6 +21,11 @@ class BookSerializer(serializers.ModelSerializer):
             'available_copies',
         ]
         read_only_fields = ['available_copies']
+        
+    def validate_total_copies(self, value):
+        if value < 0:
+            raise serializers.ValidationError("Total copies cannot be negative.")
+        return value
 
 
 class CategorySerializer(serializers.ModelSerializer):
