@@ -13,15 +13,15 @@ class BookSerializer(serializers.ModelSerializer):
     class Meta:
         model = Book
         fields = [
-            'title',
-            'author',
-            'category',
-            'isbn',
-            'total_copies',
-            'available_copies',
+            "title",
+            "author",
+            "category",
+            "isbn",
+            "total_copies",
+            "available_copies",
         ]
-        read_only_fields = ['available_copies']
-        
+        read_only_fields = ["available_copies"]
+
     def validate_total_copies(self, value):
         if value < 0:
             raise serializers.ValidationError("Total copies cannot be negative.")

@@ -6,5 +6,5 @@ class BorrowRecordSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BorrowRecord
-        exclude = ['user', 'returned_at']
-        read_only_fields = ['due_date', 'status', 'borrowed_at']
+        exclude = ["user", "returned_at"]
+        read_only_fields = ["due_date", "status", "borrowed_at"]

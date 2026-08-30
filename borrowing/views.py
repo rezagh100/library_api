@@ -13,7 +13,7 @@ class BorrowRecordViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
     queryset = BorrowRecord.objects.all()
     serializer_class = BorrowRecordSerializer
-    
+
     def get_queryset(self):
         user = self.request.user
 
@@ -24,7 +24,7 @@ class BorrowRecordViewSet(ModelViewSet):
 
     def perform_create(self, serializer):
         user = self.request.user
-        book = serializer.validated_data['book']
+        book = serializer.validated_data["book"]
         borrow_record = BorrowBook().borrow(user, book)
         serializer.instance = borrow_record
 
@@ -33,16 +33,12 @@ class BorrowRecordViewSet(ModelViewSet):
         borrow_record = self.get_object()
         user = request.user
 
-        if (
-            borrow_record.user != user
-            and user.role != User.Role.LIBRARIAN
-        ):
+        if borrow_record.user != user and user.role != User.Role.LIBRARIAN:
             return Response(
                 {"detail": "You cannot return this book."},
-                status=status.HTTP_403_FORBIDDEN
+                status=status.HTTP_403_FORBIDDEN,
             )
 
         ReturnBook().return_borrowed_book(borrow_record)
 
         return Response({"status": "book returned"})
-    

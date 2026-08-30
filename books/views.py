@@ -10,11 +10,13 @@ class BookViewSet(ModelViewSet):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
 
+
 class AuthorViewSet(ModelViewSet):
     permission_classes = [IsLibrarianOrReadOnly]
     queryset = Author.objects.all()
     serializer_class = AuthorSerializer
-    
+
+
 class CategoryViewSet(ModelViewSet):
     permission_classes = [IsLibrarianOrReadOnly]
     queryset = Category.objects.all()
