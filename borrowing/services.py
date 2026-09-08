@@ -2,7 +2,7 @@ from django.conf import settings
 from django.db import transaction
 from django.utils import timezone
 from rest_framework.exceptions import ValidationError
-
+from books.models import Book
 from .models import BorrowRecord
 
 
@@ -44,6 +44,7 @@ class BorrowBook:
     def borrow(self, user, book, due_date=None):
         with transaction.atomic():
             self.book_limit(user)
+            book = Book.objects.select_for_update().get(pk=book.pk)
             self.available_copies(book)
             self.update_available_copies(book)
 
@@ -61,14 +62,18 @@ class ReturnBook:
 
     def return_book(self, borrow_record):
         borrow_record.status = BorrowRecord.StatusChoices.RETURNED
-        borrow_record.returned_at = timezone.now()
+        
+        borrow_record.returned_at = timezone.localdate()
         borrow_record.save()
 
     def return_borrowed_book(self, borrow_record):
         with transaction.atomic():
-            if borrow_record.status != BorrowRecord.StatusChoices.BORROWED:
+            if (
+        borrow_record.status != BorrowRecord.StatusChoices.BORROWED
+        and borrow_record.status != BorrowRecord.StatusChoices.OVERDUE):
                 raise ValidationError("This book has already been returned.")
-
-            self.update_available_copies(borrow_record.book)
+            
+            book = Book.objects.select_for_update().get(pk=borrow_record.book.pk)
+            self.update_available_copies(book)
 
             self.return_book(borrow_record)
