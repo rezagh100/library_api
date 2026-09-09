@@ -5,6 +5,8 @@ from rest_framework.permissions import IsAuthenticated
 from .permissions import IsLibrarianOrReadOnly
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
+from django.db.models import Count
+
 
 class BookViewSet(ModelViewSet):
     permission_classes = [IsLibrarianOrReadOnly]
@@ -14,9 +16,14 @@ class BookViewSet(ModelViewSet):
     filterset_fields = ["author", "category"]
     search_fields = ["title"]
 
+
 class AuthorViewSet(ModelViewSet):
     permission_classes = [IsLibrarianOrReadOnly]
-    queryset = Author.objects.all()
+
+    queryset = Author.objects.annotate(
+        book_count=Count("books")
+    )
+
     serializer_class = AuthorSerializer
 
 
