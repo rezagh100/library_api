@@ -31,3 +31,6 @@ class CategoryViewSet(ModelViewSet):
     permission_classes = [IsLibrarianOrReadOnly]
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+
+
+    
