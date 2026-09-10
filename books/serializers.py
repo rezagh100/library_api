@@ -1,4 +1,3 @@
-from itsdangerous import Serializer
 from rest_framework import serializers
 from .models import Book, Author, Category
 
