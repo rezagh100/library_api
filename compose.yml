@@ -1,0 +1,17 @@
+services:
+  web:
+    build: .
+    volumes:
+      - .:/app
+    ports:
+      - "3000:3000"
+    command: python manage.py runserver 0.0.0.0:3000
+
+  redis:
+    image: redis:7
+
+  worker:
+    build: .
+    volumes:
+      - .:/app
+    command: celery -A config worker --loglevel=info
