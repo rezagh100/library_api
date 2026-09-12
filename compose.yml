@@ -15,3 +15,10 @@ services:
     volumes:
       - .:/app
     command: celery -A config worker --loglevel=info
+
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: library
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres

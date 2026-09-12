@@ -4,6 +4,7 @@ from django.utils import timezone
 from rest_framework.exceptions import ValidationError
 from books.models import Book
 from .models import BorrowRecord
+from .tasks import send_borrow_email
 
 
 class BorrowBook:
@@ -44,14 +45,24 @@ class BorrowBook:
     def borrow(self, user, book, due_date=None):
         with transaction.atomic():
             self.book_limit(user)
+    
             book = Book.objects.select_for_update().get(pk=book.pk)
             self.available_copies(book)
             self.update_available_copies(book)
-
+    
             if due_date is None:
                 due_date = self.calculate_due_date()
-
-            return self.book_record(user, book, due_date)
+    
+            borrow_record = self.book_record(user, book, due_date)
+    
+            transaction.on_commit(
+                lambda: send_borrow_email.delay(
+                    user.email,
+                    book.title,
+                )
+            )
+    
+            return borrow_record
 
 
 class ReturnBook:
@@ -62,17 +73,17 @@ class ReturnBook:
 
     def return_book(self, borrow_record):
         borrow_record.status = BorrowRecord.StatusChoices.RETURNED
-        
+
         borrow_record.returned_at = timezone.localdate()
         borrow_record.save()
 
     def return_borrowed_book(self, borrow_record):
         with transaction.atomic():
             if (
-        borrow_record.status != BorrowRecord.StatusChoices.BORROWED
-        and borrow_record.status != BorrowRecord.StatusChoices.OVERDUE):
+                    borrow_record.status != BorrowRecord.StatusChoices.BORROWED
+                    and borrow_record.status != BorrowRecord.StatusChoices.OVERDUE):
                 raise ValidationError("This book has already been returned.")
-            
+
             book = Book.objects.select_for_update().get(pk=borrow_record.book.pk)
             self.update_available_copies(book)
 
