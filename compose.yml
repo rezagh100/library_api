@@ -3,9 +3,8 @@ services:
     build: .
     volumes:
       - .:/app
-    ports:
-      - "3000:3000"
-    command: python manage.py runserver 0.0.0.0:3000
+   
+    command: gunicorn config.wsgi:application --bind 0.0.0.0:3000
 
   redis:
     image: redis:7
@@ -22,3 +21,11 @@ services:
       POSTGRES_DB: library
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+  
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./staticfiles:/app/staticfiles:ro
